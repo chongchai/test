@@ -1,6 +1,6 @@
 #!/usr/bin/php
 <?php
-$url = 'https://www.wosign.com/index.htm';
+$url = 'https://blairstorage.blob.core.chinacloudapi.cn/transfer/azurelogo.png';
 $curl = curl_init();
 curl_setopt($curl, CURLOPT_URL, $url);
 curl_setopt($curl, CURLOPT_HEADER, 1);

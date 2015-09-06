@@ -1,6 +1,6 @@
 import urllib
 try:
-  content = urllib.urlopen('https://www.wosign.com/index.htm')
+  content = urllib.urlopen('https://blairstorage.blob.core.chinacloudapi.cn/transfer/azurelogo.png')
   print content.info()
   print content.read()
 except Exception,ex:

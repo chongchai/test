@@ -8,7 +8,7 @@ public class HTTPSClient {
 
   public static void main(String[] args) {
     int port = 443; // default https port
-    String host = "www.wosign.com";
+    String host = "blairstorage.blob.core.chinacloudapi.cn";
 
     try {
       SSLSocketFactory factory

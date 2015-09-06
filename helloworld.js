@@ -1,6 +1,6 @@
 var https = require('https');
 
-https.get('https://www.wosign.com/index.htm', function(res) {
+https.get('https://blairstorage.blob.core.chinacloudapi.cn/transfer/azurelogo.png', function(res) {
   console.log("statusCode: ", res.statusCode);
   console.log("headers: ", res.headers);
 
