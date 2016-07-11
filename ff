@@ -45,6 +45,33 @@ public class View extends ViewPart {
 	Composite sectionClient;
 	FormToolkit toolkit;
 	
+	protected Control createContents2(Composite parent) {
+		Composite container = new Composite(parent, SWT.NONE);
+		container.setBackground(SWTResourceManager.getColor(SWT.COLOR_RED));
+		container.setLayout(new FillLayout(SWT.VERTICAL));
+		{
+			Group grpTt = new Group(container, SWT.NONE);
+			grpTt.setBackground(SWTResourceManager.getColor(SWT.COLOR_WHITE));
+			grpTt.setText("tt1");
+			grpTt.setLayout(new GridLayout(2, false));
+			{
+				Label label = new Label(grpTt, SWT.NONE);
+				label.setBackground(SWTResourceManager.getColor(SWT.COLOR_WHITE));
+				label.setText("New Label");
+				
+				text = new Text(grpTt, SWT.BORDER);
+				text.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
+			}
+		}
+		{
+			Group grpTt_1 = new Group(container, SWT.NONE);
+			grpTt_1.setBackground(SWTResourceManager.getColor(SWT.COLOR_WHITE));
+			grpTt_1.setText("tt2");
+		}
+
+		return container;
+	}
+	
 	public void show(Composite parent)
 	{
 		 parent.setLayout(new FillLayout(SWT.VERTICAL));
