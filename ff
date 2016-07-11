@@ -1,0 +1,222 @@
+package mail;
+
+
+
+import javax.swing.event.HyperlinkEvent;
+
+import org.eclipse.jface.dialogs.MessageDialog;
+import org.eclipse.jface.resource.JFaceResources;
+import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.SelectionAdapter;
+import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.graphics.Color;
+import org.eclipse.swt.graphics.Font;
+import org.eclipse.swt.layout.FillLayout;
+import org.eclipse.swt.layout.GridData;
+import org.eclipse.swt.layout.GridLayout;
+import org.eclipse.swt.widgets.Button;
+import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Display;
+import org.eclipse.swt.widgets.Group;
+import org.eclipse.swt.widgets.Label;
+import org.eclipse.swt.widgets.Link;
+import org.eclipse.swt.widgets.Text;
+import org.eclipse.ui.forms.events.ExpansionAdapter;
+import org.eclipse.ui.forms.events.ExpansionEvent;
+import org.eclipse.ui.forms.events.HyperlinkAdapter;
+import org.eclipse.ui.forms.widgets.Form;
+import org.eclipse.ui.forms.widgets.FormToolkit;
+import org.eclipse.ui.forms.widgets.Hyperlink;
+import org.eclipse.ui.forms.widgets.Section;
+import org.eclipse.ui.forms.widgets.TableWrapData;
+import org.eclipse.ui.forms.widgets.TableWrapLayout;
+import org.eclipse.ui.part.ViewPart;
+
+public class View extends ViewPart {
+
+	public static final String ID = "mail.view";
+	
+	Form  form;
+	Composite parent;
+	/**
+	 * The text control that's displaying the content of the email message.
+	 */
+	private Text messageText;
+	Composite sectionClient;
+	FormToolkit toolkit;
+	
+	public void show(Composite parent)
+	{
+		 parent.setLayout(new FillLayout(SWT.VERTICAL));
+		 Group titleGroup = new Group(parent,SWT.NONE);
+		 titleGroup.setText("title");
+		 GridData gd = new GridData(GridData.FILL_BOTH);
+		 gd.heightHint = 10;
+		 GridLayout layout = new GridLayout();
+		 titleGroup.setLayout(layout);
+		 titleGroup.setLayoutData(gd);
+		 
+		 Text name = new Text(titleGroup, SWT.MULTI | SWT.WRAP);
+		 name.setText("function name");
+		 name.setLayoutData(new GridData(GridData.FILL_BOTH));
+		 Label label = new Label(titleGroup, SWT.NONE);
+		 label.setText("a lebl");
+		 label.setLayoutData(new GridData(GridData.FILL_BOTH));
+		 
+		 Group titleGroup2 = new Group(parent,SWT.NONE);
+		 titleGroup2.setText("title2");
+		 GridData gd2 = new GridData(GridData.FILL_BOTH);
+		 gd2.heightHint = 10;
+		 GridLayout layout2 = new GridLayout();
+		 titleGroup2.setLayout(layout2);
+		 titleGroup2.setLayoutData(gd2);
+		 
+		 Text name2 = new Text(titleGroup2, SWT.MULTI | SWT.WRAP);
+		 name2.setText("function name2");
+		 name2.setLayoutData(new GridData(GridData.FILL_BOTH));
+	}
+	
+	public void createPartControl(Composite parent) {
+		
+		show(parent);
+//		Composite top = new Composite(parent, SWT.NONE);
+//		GridLayout layout = new GridLayout();
+//		layout.marginHeight = 0;
+//		layout.marginWidth = 0;
+//		top.setLayout(layout);
+//		
+//		Composite banner2 = new Composite(top, SWT.NONE);
+//		//banner2.setLayoutData(new GridData(GridData.HORIZONTAL_ALIGN_FILL, GridData.VERTICAL_ALIGN_BEGINNING, true, false));
+//		banner2.setLayoutData(new GridData(GridData.FILL_BOTH)); 
+//		layout = new GridLayout();
+//		layout.marginHeight = 0;
+//		layout.marginWidth = 0;
+//		layout.numColumns = 2;
+//		banner2.setLayout(layout);
+//		Label label = new Label(banner2, SWT.SEPARATOR | SWT.HORIZONTAL);
+//		label.setLayoutData(new GridData(GridData.FILL_BOTH) );
+//		
+//		// top banner
+//		Composite banner = new Composite(top, SWT.NONE);
+//		banner.setLayoutData(new GridData(GridData.HORIZONTAL_ALIGN_FILL, GridData.VERTICAL_ALIGN_BEGINNING, true, false));
+//		layout = new GridLayout();
+//		layout.marginHeight = 5;
+//		layout.marginWidth = 5;
+//		layout.numColumns = 2;
+//		banner.setLayout(layout);
+//		
+//		// setup bold font
+//		Font boldFont = JFaceResources.getFontRegistry().getBold(JFaceResources.DEFAULT_FONT);    
+//		
+//		Label l = new Label(banner, SWT.NONE);
+//		l.setText("Subject:");
+//		l.setFont(boldFont);
+//		l.setLayoutData(new GridData(SWT.BEGINNING, SWT.BEGINNING, false, false));
+//		
+//		l = new Label(banner, SWT.WRAP);
+//		l.setText("This is a message about the cool Eclipse RCP!");
+//		l.setLayoutData(new GridData(SWT.BEGINNING, SWT.BEGINNING, true, false));
+//		
+//		l = new Label(banner, SWT.NONE);
+//		l.setText("From:");
+//		l.setFont(boldFont);
+//		l.setLayoutData(new GridData(SWT.BEGINNING, SWT.BEGINNING, false, false));
+//    
+//		final Link link = new Link(banner, SWT.NONE);
+//		link.setText("<a>nicole@mail.org</a>");
+//		link.addSelectionListener(new SelectionAdapter() {    
+//			public void widgetSelected(SelectionEvent e) {
+//				MessageDialog.openInformation(getSite().getShell(), "Not Implemented", "Imagine the address book or a new message being created now.");
+//			}    
+//		});
+//		link.setLayoutData(new GridData(SWT.BEGINNING, SWT.BEGINNING, true, false));
+//    
+//		l = new Label(banner, SWT.NONE);
+//		l.setText("Date:");
+//		l.setFont(boldFont);
+//		l.setLayoutData(new GridData(SWT.BEGINNING, SWT.BEGINNING, false, false));
+//		
+//		l = new Label(banner, SWT.WRAP);
+//		l.setText("10:34 am");
+//		l.setLayoutData(new GridData(SWT.BEGINNING, SWT.BEGINNING, true, false));
+//		
+//		
+//
+//		
+//		// message contents
+//		messageText = new Text(top, SWT.MULTI | SWT.WRAP);
+//		messageText.setText("This RCP Application was generated from the PDE Plug-in Project wizard. This sample shows how to:\n"+
+//						"- add a top-level menu and toolbar with actions\n"+
+//						"- add keybindings to actions\n" +
+//						"- create views that can't be closed and\n"+
+//						"  multiple instances of the same view\n"+
+//						"- perspectives with placeholders for new views\n"+
+//						"- use the default about dialog\n"+
+//						"- create a product definition\n");
+//		messageText.setLayoutData(new GridData(GridData.FILL_BOTH));
+//		this.parent = parent;
+//		 toolkit = new FormToolkit(parent.getDisplay());
+//		form = toolkit.createForm(parent);
+//		  form.setText("Hello, Eclipse Forms");
+//
+//		  TableWrapLayout layout = new TableWrapLayout();
+//		  form.getBody().setLayout(layout);
+//		  Hyperlink link = toolkit.createHyperlink(form.getBody(),"Click here.", SWT.WRAP);
+//		  link.addHyperlinkListener(new HyperlinkAdapter() {
+//		   public void linkActivated(HyperlinkEvent e) {
+//		    System.out.println("Link activated!");
+//		   }
+//		  });
+//		  link.setText("This is an example of a form that is much longer and will need to wrap.");
+//		  layout.numColumns = 2;
+//		  TableWrapData td = new TableWrapData();
+//		  td.colspan = 2;
+//		  link.setLayoutData(td);
+//		  
+//		  
+//		  Section section = toolkit.createSection(form.getBody(), 
+//				  Section.DESCRIPTION|Section.TITLE_BAR|
+//				  Section.TWISTIE|Section.EXPANDED);
+//				 td = new TableWrapData(TableWrapData.FILL);
+//				 td.colspan = 2;
+//				 section.setLayoutData(td);
+//				 section.addExpansionListener(new ExpansionAdapter() {
+//				  public void expansionStateChanged(ExpansionEvent e) {
+//				   form.layout();
+//				  }
+//				 });
+//				 section.setText("Section title");
+//				 section.setDescription("This is the description that goes "+
+//				      "below the title");
+//				 sectionClient = toolkit.createComposite(section);
+//				 sectionClient.setLayout(new GridLayout());
+//				 Text tt = toolkit.createText(sectionClient, "", SWT.WRAP |SWT.MULTI | SWT.V_SCROLL | SWT.H_SCROLL);
+//				 String text = "this is aaa test text.\n"
+//						 + "this is aaa test text.this is aaa test text.this is aaa test text.this is aaa test text.\n"
+//						 + "this is aaa test text.\n"
+//						 + "this is aaa test text.\n";
+//				 tt.setText(text);
+//				 tt.setBackground(Display.getCurrent().getSystemColor (SWT.COLOR_YELLOW));
+//				 
+//				 tt.setForeground(Display.getCurrent().getSystemColor (SWT.COLOR_BLUE));
+//				 
+//				 section.setClient(sectionClient);  
+	}
+
+	public void setFocus() {
+		//messageText.setFocus();
+	}
+	
+	public void updateContent()
+	{
+		//form.setText("Hello, Eclipse Forms2");
+		 //Button button = toolkit.createButton(sectionClient, "Radio 3", SWT.RADIO);
+		 
+//		 form.dispose();
+//		 
+//		 form = toolkit.createForm(parent);
+//		  form.setText("Hello, Eclipse Forms33");
+//		  parent.layout();
+		 //form = toolkit.createForm(parent);
+	}
+}
