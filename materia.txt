@@ -1,2 +1,3 @@
 http://wiki.eclipse.org/JFaceSnippets
 TechLand: Assisting Technology Landscape Inquiries with Insights from Stack Overflow
+http://homepage.usask.ca/~masud.rahman/rack/
