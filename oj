@@ -1,0 +1,253 @@
+import java.io.BufferedReader;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
+enum Role {
+	Taxi,
+	Passenger,
+	Other
+}
+
+class Point {
+	int x;
+	int y;
+	
+	Role role;
+	
+	List<Point> neighbors;
+	int isVisited;
+	Point prePoint;
+	
+	Point(int x, int y) {
+		this.x = x;
+		this.y = y;
+		
+		role = Role.Other;
+		neighbors = new ArrayList<Point>();
+		
+		isVisited = 0;
+		prePoint = null;
+		
+	}
+	
+	public static Point buildPoint(String line) {
+		String[] tmp = line.substring(1, line.length() - 1).split(",");
+		return new Point(Integer.parseInt(tmp[0]), Integer.parseInt(tmp[1]));
+	}
+	
+	public String toSimpleString() {
+		return x + "*" + y;
+	}
+	
+	public String toTupleString() {
+		return "(" + x + "," + y + ")";
+	}
+	
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + x;
+		result = prime * result + y;
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		Point other = (Point) obj;
+		if (x != other.x)
+			return false;
+		if (y != other.y)
+			return false;
+		return true;
+	}
+}
+
+public class App {
+	private Map<String, Point> allPoints;
+	private Point passenger;
+	private Set<String> taxis;
+	
+	public String findRoutes(String inputFilePath) {
+		initData();
+		try {
+			readFile(inputFilePath);
+			
+			Point taxi = calculateNearestTaxi();
+			
+			return getPathByTaxi(taxi);
+		} catch (Exception e) {
+			return "";
+		}
+	}
+	
+	private void initData() {
+		allPoints = new HashMap<String, Point>();
+		passenger = null;
+		taxis = new HashSet<String>();
+	}
+	
+	private void readFile(String inputFilePath) {
+		try {
+			BufferedReader reader = new BufferedReader(new FileReader(inputFilePath));
+			String lineOne = reader.readLine();
+			setPassenger(lineOne.trim());
+			
+			String lineTwo = reader.readLine();
+			setTaxis(lineTwo.trim());
+			
+			String lineThree = reader.readLine();
+			setRoads(lineThree.trim());
+			
+		} catch (FileNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+	
+	private void setPassenger(String line) {
+		Point tmp = Point.buildPoint(line);
+		passenger = tmp;
+	}
+	
+	private void setTaxis(String line) {
+		String[] tmps = line.split(";");
+		for (String tmp : tmps) {
+			taxis.add(Point.buildPoint(tmp).toSimpleString());
+		}
+	}
+	
+	private void setRoads(String line) {
+		String[] tmps = line.split(";");
+		for (String tmp : tmps) {
+			int index = tmp.indexOf(")");
+			String start = tmp.substring(0, index + 1);
+			String end = tmp.substring(index + 1, tmp.length() - 1);
+			String flag = tmp.substring(tmp.length() - 1);
+			if (flag == "0") {
+				setRoad(start+end);
+				setRoad(end+start);
+			} else {
+				setRoad(start+end);
+			}
+		}
+	}
+	
+	private void setRoad(String str) {
+		int index = str.indexOf(")");
+		String start = str.substring(0, index + 1);
+		String end = str.substring(index + 1, str.length());
+		
+		Point startPoint = Point.buildPoint(start);
+		Point endPoint = Point.buildPoint(end);
+
+		if (startPoint.x == endPoint.x) {
+			int gap = startPoint.y < endPoint.y ? 1 : -1;
+			int tmp = startPoint.y;
+			while (tmp != endPoint.y) {
+				Point current = getPoint(startPoint.x, tmp);
+				current.role = getRole(current.x, current.y);
+				current.neighbors.add(getPoint(startPoint.x, tmp + gap));
+				
+				tmp += gap;
+			}
+		} else { // y equals
+			int gap = startPoint.x < endPoint.x ? 1 : -1;
+			int tmp = startPoint.x;
+			while (tmp != endPoint.x) {
+				Point current = getPoint(tmp, startPoint.y);
+				current.role = getRole(current.x, current.y);
+				current.neighbors.add(getPoint(tmp + gap, startPoint.y));
+				
+				tmp += gap;
+			}
+		}
+	}
+	
+	
+	private Role getRole(int x, int y) {
+		if (passenger.x == x && passenger.y == y) {
+			return Role.Passenger;
+		}
+		
+		if (taxis.contains(x + "*" + y)) {
+			return Role.Taxi;
+		}
+		
+		return Role.Other;
+	}
+	
+	private Point getPoint(int x, int y) {
+		String key = x + "*" + y;
+		if (allPoints.containsKey(key)) {
+			return allPoints.get(key);
+		} else {
+			Point tmp = new Point(x, y);
+			allPoints.put(key, tmp);
+			return allPoints.get(key);
+		}
+	}
+
+	private Point calculateNearestTaxi() {
+		Point start = getPoint(passenger.x, passenger.y);
+		
+		LinkedList<Point> queue = new LinkedList<Point>();
+		queue.addLast(start);
+		start.isVisited = 1;
+		
+		Point targetTaxi = null;
+		
+		while (queue.size() != 0) {
+			Point current = queue.poll();
+			
+			if (current.role == Role.Taxi) {
+				targetTaxi = current;
+				break;
+			}
+			
+			for (Point neighbor : current.neighbors) {
+				if (neighbor.isVisited == 0) {
+					neighbor.prePoint = current;
+					neighbor.isVisited = 1;
+					
+					queue.addLast(neighbor);
+				}
+			}
+		}
+		
+		return targetTaxi;
+	}
+	
+	private String getPathByTaxi(Point taxi) {
+		if (taxi == null) {
+			return "";
+		}
+		
+		StringBuffer path = new StringBuffer();
+		Point tmp = taxi;
+		
+		while (tmp != null && tmp.role != Role.Passenger) {
+			path.append(tmp.toTupleString());
+			tmp = tmp.prePoint;
+		}
+		
+		return path.toString();
+	}
+}
