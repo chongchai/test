@@ -1,0 +1,248 @@
+import java.util.ArrayList;
+import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
+class Number {
+	public int flag; // -1: less than 0, 0: equals 0, 1: large than 0
+	public String absValue;
+	public boolean isValid;
+	public int xiaoShuWei;
+
+	private List<Integer> reverseRet = new ArrayList<Integer>();
+
+	public Number() {
+	}
+
+	public Number(String input) {
+		isValid = true;
+		String fuhao = "";
+		String value = "";
+		xiaoShuWei = 0;
+
+		fuhao = input.substring(0, 1);
+		if (fuhao.equals("+")) {
+			flag = 1;
+			value = input.substring(1);
+		} else if (fuhao.equals("-")) {
+			flag = -1;
+			value = input.substring(1);
+		} else {
+			flag = 1;
+			value = input;
+		}
+
+		this.format(value);
+
+	}
+
+	public void format(String value) {
+		int index = value.indexOf(".");
+		if (index == 0) {
+			isValid = false;
+			return;
+		}
+
+		String strRemovedBothZero = removeBothZero(value);
+
+		int tmpIndex = strRemovedBothZero.indexOf(".");
+		xiaoShuWei = strRemovedBothZero.length() - 1 - tmpIndex;
+		absValue = strRemovedBothZero.replaceAll("\\.", "");
+	}
+
+	private String removeBothZero(String str) {
+		int index = str.indexOf(".");
+
+		if (index == -1) {
+			str += ".";
+			index = str.indexOf(".");
+		}
+
+		int start = index - 1;
+		for (int i = 0; i < index - 1; i++) {
+			char tmp = str.charAt(i);
+			if (tmp != '0') {
+				start = i;
+				break;
+			}
+		}
+
+		int end = index;
+		for (int i = str.length() - 1; i > index; i--) {
+			if (str.charAt(i) != '0') {
+				end = i;
+				break;
+			}
+		}
+
+		String strRemovedBothZero = str.substring(start, end + 1);
+
+		return strRemovedBothZero;
+	}
+
+	public Number multiply(Number other) {
+		reverseRet.clear();
+
+		String strA = this.reverseString();
+		String strB = other.reverseString();
+
+		for (int i = 0; i < strB.length(); i++) {
+			int tmpB = (int) (strB.charAt(i) - '0');
+			List<Integer> oneBitRet = new ArrayList<Integer>();
+			for (int k = 0; k < i; k++) {
+				oneBitRet.add(0);
+			}
+			int tmpAddBit = 0;
+
+			for (int j = 0; j < strA.length(); j++) {
+				int tmpA = (int) (strA.charAt(j) - '0');
+				int ret = tmpA * tmpB + tmpAddBit;
+
+				int currentBit = ret % 10;
+				tmpAddBit = ret / 10;
+				oneBitRet.add(currentBit);
+			}
+
+			if (tmpAddBit != 0) {
+				oneBitRet.add(tmpAddBit);
+			}
+
+			addResult(oneBitRet);
+		}
+
+		Number ret = fromReverseRet();
+		ret.flag = this.flag * other.flag;
+		ret.xiaoShuWei = this.xiaoShuWei + other.xiaoShuWei;
+
+		return ret;
+	}
+
+	public String reverseString() {
+		StringBuffer tmp = new StringBuffer(absValue);
+		return tmp.reverse().toString();
+	}
+
+	public String toString() {
+		String prefix = "";
+		if (this.flag == -1) {
+			prefix = "-";
+		}
+
+		String result = "";
+		int len = this.absValue.length();
+		if (this.xiaoShuWei != 0) {
+			int index = len - this.xiaoShuWei;
+			result += this.absValue.substring(0, index);
+			result += ".";
+			result += this.absValue.substring(index);
+		} else {
+			result = this.absValue;
+		}
+
+		String formatedStr = removeBothZero(result);
+		if (formatedStr.endsWith(".")) {
+			formatedStr = formatedStr.substring(0, formatedStr.length() - 1);
+		}
+
+		return prefix + formatedStr;
+	}
+
+	private void addResult(List<Integer> oneBitRet) {
+		int addBit = 0;
+
+		if (reverseRet.size() < oneBitRet.size() + 1) {
+			for (int i = reverseRet.size(); i < oneBitRet.size() + 1; i++) {
+				reverseRet.add(0);
+			}
+		}
+
+		for (int i = 0; i < oneBitRet.size(); i++) {
+			int tmpRet = oneBitRet.get(i) + reverseRet.get(i) + addBit;
+			int currentBit = tmpRet % 10;
+			addBit = tmpRet / 10;
+
+			reverseRet.set(i, currentBit);
+		}
+
+		if (addBit != 0) {
+			int targetIndex = oneBitRet.size();
+			while (targetIndex <= reverseRet.size() - 1 && addBit != 0) {
+				int tmpRet = reverseRet.get(targetIndex) + addBit;
+				int currentBit = tmpRet % 10;
+				addBit = tmpRet / 10;
+
+				reverseRet.set(targetIndex, currentBit);
+			}
+
+			if (addBit != 0) {
+				reverseRet.add(addBit);
+			}
+		}
+	}
+
+	private Number fromReverseRet() {
+		StringBuffer tmp = new StringBuffer();
+		for (int i = this.reverseRet.size() - 1; i >= 0; i--) {
+			tmp.append(this.reverseRet.get(i));
+		}
+
+		Number result = new Number();
+		result.absValue = tmp.toString();
+		return result;
+	}
+}
+
+public class App2 {
+	public static void main(String[] args) {
+		String result = App2.multiply("12345.678", "-871.23");
+		System.out.println(result);
+		return;
+	}
+
+	public static String multiply(String multiplierA, String multiplierB) {
+		if (!isValid(multiplierA) || !isValid(multiplierB)) {
+			return null;
+		}
+
+		if (isZero(multiplierA) || isZero(multiplierB)) {
+			return "0";
+		}
+
+		Number numberA = new Number(multiplierA);
+		Number numberB = new Number(multiplierB);
+
+		if (!numberA.isValid || !numberB.isValid) {
+			return null;
+		}
+
+		Number result = numberA.multiply(numberB);
+
+		return result.toString();
+	}
+
+	public static boolean isValid(String str) {
+		if (str.equals("")) {
+			return false;
+		}
+		
+        Pattern pattern = Pattern.compile("^[+-]?[0-9]+\\.?[0-9]*$");
+        Matcher isNum = pattern.matcher(str);
+        if( !isNum.matches() ){
+            return false;
+        }
+        return true;
+	}
+
+	public static boolean isZero(String str) {
+		String tmp = str.replaceAll("\\+", "");
+		tmp = tmp.replaceAll("-", "");
+		tmp = tmp.replaceAll("\\.", "");
+		tmp = tmp.replaceAll("0", "");
+		if (tmp.equals("")) {
+			return true;
+		} else {
+			return false;
+		}
+	}
+
+}
