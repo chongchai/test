@@ -1,0 +1,333 @@
+import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.List;
+
+class Point {
+	BigDecimal x;
+	BigDecimal y;
+	
+	Point(BigDecimal x, BigDecimal y) {
+		this.x = x;
+		this.y = y;
+	}
+	
+	public int getIntX() {
+		return x.intValue();
+	}
+	
+	public int getIntY() {
+		return y.intValue();
+	}
+	
+	public String toTupleString() {
+		return "(" + getIntX() + "," + getIntY() + ")";
+	}
+	
+	public String toString() {
+		return this.toTupleString();
+	}
+}
+
+class Grid {
+	Point leftBottom;
+	Point leftTop;
+	Point rightTop;
+	Point rightBottom;
+	BigDecimal width;
+	
+	List<Point> leftPoints;
+	List<Point> rightPoints;
+	
+	List<Point> crossPoints;
+	
+	public String toString() {
+		return leftBottom.toTupleString() + "|" + leftTop.toTupleString() + "|" + rightTop.toTupleString() + "|" + rightBottom.toTupleString();
+	}
+	
+	Grid(BigDecimal x, BigDecimal y, BigDecimal width) {
+		this.width = width;
+		crossPoints = new ArrayList<Point>();
+		leftPoints = new ArrayList<Point>();
+		rightPoints = new ArrayList<Point>();
+		
+		leftBottom = new Point(x, y);
+		leftTop = new Point(x, y.add(width));
+		rightTop = new Point(x.add(width), y.add(width));
+		rightBottom = new Point(x.add(width), y);
+	}
+	
+	public void computeOrder() {
+		if (crossPoints.size() == 1) {
+			computeOrderForLastGrid();
+		} else {
+			computeOrderForOtherGrid();
+		}
+	}
+	
+	private void computeOrderForLastGrid() {
+		Point inPoints = crossPoints.get(0);
+		int xRet = leftBottom.x.compareTo(inPoints.x);
+		int yRet = leftBottom.y.compareTo(inPoints.y);
+		if (xRet == -1 && yRet == 0) {
+			leftPoints.add(leftBottom);
+			leftPoints.add(leftTop);
+			leftPoints.add(rightTop);
+			leftPoints.add(rightBottom);
+		} else if (xRet == 0 && yRet == 0) {
+			leftPoints.add(leftBottom);
+			leftPoints.add(leftTop);
+			leftPoints.add(rightTop);
+			leftPoints.add(rightBottom);
+			rightPoints.add(leftBottom);
+		} else {
+			leftPoints.add(leftTop);
+			leftPoints.add(rightTop);
+			leftPoints.add(rightBottom);
+			leftPoints.add(leftBottom);
+		}
+	}
+	
+	private void computeOrderForOtherGrid() {
+		Point inPoints = crossPoints.get(0);
+		Point outPoints = crossPoints.get(1);
+		
+		
+		int xRetIn = inPoints.x.compareTo(leftBottom.x);
+		int yRetIn = inPoints.y.compareTo(leftBottom.y);
+		
+		int xRetOut = outPoints.x.compareTo(rightTop.x);
+		int yRetOut = outPoints.y.compareTo(rightTop.y);
+		
+		// inPoints in leftBottom -> leftTop
+		if (xRetIn == 0 && yRetIn == 1) {
+			inPointsBetweenLeftBottomAndLeftTop(xRetIn, yRetIn, xRetOut, yRetOut);
+		} else if (xRetIn == 0 && yRetIn == 0) {   // inPoints in leftBottom
+			inPointsAtLeftBottom(xRetIn, yRetIn, xRetOut, yRetOut);
+		} else {   // inPoints in leftBottom -> rightBottom
+			inPointsBetweenLeftBottomAndRightBottom(xRetIn, yRetIn, xRetOut, yRetOut);
+		}
+	}
+	
+	private void inPointsBetweenLeftBottomAndLeftTop(int xRetIn, int yRetIn, int xRetOut, int yRetOut) {
+		if (xRetOut == -1 && yRetOut == 0) {
+			leftPoints.add(leftTop);
+			rightPoints.add(rightTop);
+			rightPoints.add(rightBottom);
+			rightPoints.add(leftBottom);
+		} else if (xRetOut == 0 && yRetOut == 0) {
+			leftPoints.add(leftTop);
+			leftPoints.add(rightTop);
+			rightPoints.add(rightTop);
+			rightPoints.add(rightBottom);
+			rightPoints.add(leftBottom);
+		} else {
+			leftPoints.add(leftTop);
+			leftPoints.add(rightTop);
+			rightPoints.add(rightBottom);
+			rightPoints.add(leftBottom);
+		}
+	}
+	
+	private void inPointsAtLeftBottom(int xRetIn, int yRetIn, int xRetOut, int yRetOut) {
+		if (xRetOut == -1 && yRetOut == 0) {
+			leftPoints.add(leftBottom);
+			leftPoints.add(leftTop);
+			rightPoints.add(rightTop);
+			rightPoints.add(rightBottom);
+			rightPoints.add(leftBottom);
+		} else if (xRetOut == 0 && yRetOut == 0) {
+			leftPoints.add(leftBottom);
+			leftPoints.add(leftTop);
+			leftPoints.add(rightTop);
+			rightPoints.add(rightTop);
+			rightPoints.add(rightBottom);
+			rightPoints.add(leftBottom);
+		} else {
+			leftPoints.add(leftBottom);
+			leftPoints.add(leftTop);
+			leftPoints.add(rightTop);
+			rightPoints.add(rightBottom);
+			rightPoints.add(leftBottom);
+		}
+	}
+	
+	private void inPointsBetweenLeftBottomAndRightBottom(int xRetIn, int yRetIn, int xRetOut, int yRetOut) {
+		if (xRetOut == -1 && yRetOut == 0) {
+			leftPoints.add(leftBottom);
+			leftPoints.add(leftTop);
+			rightPoints.add(rightTop);
+			rightPoints.add(rightBottom);
+		} else if (xRetOut == 0 && yRetOut == 0) {
+			leftPoints.add(leftBottom);
+			leftPoints.add(leftTop);
+			leftPoints.add(rightTop);
+			rightPoints.add(rightTop);
+			rightPoints.add(rightBottom);
+		} else {
+			leftPoints.add(leftBottom);
+			leftPoints.add(leftTop);
+			leftPoints.add(rightTop);
+			rightPoints.add(rightBottom);
+		}
+	}
+}
+
+public class App4 {
+	int numberOfGrids = 0;
+	List<Grid> allGrids = new ArrayList<Grid>();
+	
+	public static void main(String[] args) {
+		// TODO Auto-generated method stub
+		String result = new App4().calc(2, 45, 6, 2);
+		System.out.println(result);
+	}
+	
+	public void initData() {
+		this.allGrids.clear();
+		this.numberOfGrids = 0;
+	}
+	
+	public String calc(int gridWidth, int angle, int power, int attenuation) {
+		if (!isParamsValid(gridWidth, angle, power, attenuation)) {
+			return null;
+		}
+		
+		computeNumberOfGrids(power, attenuation);
+		
+		computeGrids(gridWidth, angle, power, attenuation);
+		
+		String result = computePointsInClock();
+		return result;
+	}
+	
+	private boolean isParamsValid(int gridWidth, int angle, int power, int attenuation) {
+		if (gridWidth <= 0) {
+			return false;
+		}
+		
+		if (angle <= 0 || angle >= 90) {
+			return false;
+		}
+		
+		if (power <= 0) {
+			return false;
+		}
+		
+		if (attenuation <= 0) {
+			return false;
+		}
+		
+		return true;
+	}
+
+	private void computeNumberOfGrids(int power, int attenuation) {
+		int number = power / attenuation;
+		if ((power % attenuation) != 0) {
+			number++;
+		}
+		numberOfGrids = number;
+	}
+
+	private Point getLeftBottomPointFromInPoint(Point point, int width) {
+		int x = ((point.getIntX()) / width) * width;
+		int y = ((point.getIntY()) / width) * width; 
+		return new Point(new BigDecimal(x), new BigDecimal(y));
+	}
+	
+	private void computeGrids(int gridWidth, int angle, int power, int attenuation) {
+		Point lastPoint = new Point(new BigDecimal(0), new BigDecimal(0));
+		while (power > 0) {
+			power -= attenuation;
+			
+			Point leftBottomPoint = getLeftBottomPointFromInPoint(lastPoint, gridWidth);
+			Grid currentGrid = new Grid(leftBottomPoint.x, leftBottomPoint.y, new BigDecimal(gridWidth));
+			currentGrid.crossPoints.add(lastPoint);
+			
+			Point nextPoint = findOtherPoint(currentGrid, lastPoint, gridWidth, angle);
+			if (power > 0) {
+				currentGrid.crossPoints.add(nextPoint);
+			}
+			
+			currentGrid.computeOrder();
+			
+			allGrids.add(currentGrid);
+			
+			lastPoint = nextPoint;
+		}
+	}
+	
+	private Point findOtherPoint(Grid currentGrid, Point startPoint, int gridWidth, int angle) {
+		Double rad = Math.toRadians(angle);
+		BigDecimal data1 = new BigDecimal(Math.tan(rad)).setScale(10, BigDecimal.ROUND_HALF_DOWN);  //v
+		BigDecimal data2 = (currentGrid.rightTop.y.subtract(startPoint.y)).divide(currentGrid.rightTop.x.subtract(startPoint.x), 10 , BigDecimal.ROUND_HALF_DOWN);
+		
+		BigDecimal x = BigDecimal.ZERO;
+		BigDecimal y = BigDecimal.ZERO;
+		if (data1.compareTo(data2) < 0) {
+			x = currentGrid.rightTop.x;
+			y = data1.multiply(x.subtract(startPoint.x)).add(startPoint.y);
+		} else if (data1.compareTo(data2) > 0) {
+			y = currentGrid.rightTop.y;
+			x = ((y.subtract(startPoint.y)).divide(data1, 10 , BigDecimal.ROUND_HALF_DOWN)).add(startPoint.x);
+		} else {
+			x = currentGrid.rightTop.x;
+			y = currentGrid.rightTop.y;
+		}
+		
+		return new Point(x, y);
+	}
+
+	private String computePointsInClock() {
+		LinkedHashMap<String, Point> allLeftPoints = new LinkedHashMap<String, Point>();
+		LinkedHashMap<String, Point> allRightPoints = new LinkedHashMap<String, Point>();
+		for (Grid grid : allGrids) {
+			addToPointList(allLeftPoints, grid.leftPoints);
+		}
+		
+		for (int i = allGrids.size() - 1; i >= 0; i--) {
+			addToPointList(allRightPoints, allGrids.get(i).rightPoints);
+		}
+		
+		List<Point> allPoints = new ArrayList<Point>();
+		
+		allPoints.addAll(allLeftPoints.values());
+		allPoints.addAll(allRightPoints.values());
+		
+		StringBuffer result = new StringBuffer();
+		Point candidatePoint = null;
+		Point currentPoint = null;
+		int number = 0;
+		
+		result.append(allPoints.get(0).toTupleString());
+		for (int i = 1; i < allPoints.size() - 1; i++) {
+			Point before = allPoints.get(i - 1);
+			Point current = allPoints.get(i);
+			Point next = allPoints.get(i + 1);
+			
+			if ((before.getIntX() == current.getIntX()) && (current.getIntX() == next.getIntX())) {
+				continue;
+			} else if ((before.getIntY() == current.getIntY()) && (current.getIntY() == next.getIntY())) {
+				continue;
+			} else if ((before.getIntX() == current.getIntX()) && (before.getIntY() != current.getIntY()) 
+					&& (current.getIntY() == next.getIntY())) {
+				result.append(",");
+				result.append(current.toTupleString());
+			} else if ((before.getIntY() == current.getIntY()) && (before.getIntX() != current.getIntX())
+					&& (current.getIntX() == next.getIntX())) {
+				result.append(",");
+				result.append(current.toTupleString());
+			}
+		}
+		
+		return result.toString();
+	}
+	
+	private void addToPointList(LinkedHashMap<String, Point> allPoints, List<Point> toAddPoints) {
+		for (Point point : toAddPoints) {
+			if (!allPoints.containsKey(point.toTupleString())) {
+				allPoints.put(point.toTupleString(), point);
+			}
+		}
+	}
+}
