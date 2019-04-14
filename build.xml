@@ -1,0 +1,25 @@
+<?xml version="1.0"?>
+<project name="hello">
+	<target name="run">
+		<echo message="hello world" />
+		<exec executable="python" timeout="1000">
+			<arg value="D:\\allJoyn\\ant\\test.py"/>
+		</exec>
+		<echo message="this is end" />
+	</target>
+	<target name="exec-timeout">
+	  <record name="exec.log" action="start" />
+		<exec executable="python" timeout="1000">
+			<arg value="D:\\allJoyn\\ant\\test.py"/>
+		</exec>
+	  <record name="exec.log" action="stop" />      
+
+	  <condition property="timed-out" else="false">
+		<resourcecontains resource="exec.log"
+			substring="Timeout: killed the sub-process" />
+	  </condition>
+	  <delete file="exec.log" />
+
+	  <echo message="exec timed out: ${timed-out}" />
+	</target>
+</project>
